@@ -18,7 +18,13 @@ DB_DATABASE=
 DB_USERNAME=
 DB_PASSWORD=
 ```
-#### 3. Create schema database
+
+#### 3. Install dependencies
+```bash
+composer install
+```
+
+#### 4. Create schema database
 ```bash
 php artisan migrate
 ```
