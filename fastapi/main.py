@@ -1,55 +1,47 @@
-from typing import Annotated, final
-from fastapi import Depends, FastAPI
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 
-import model
-from model import Product
-from database import SessionLocal, engine
+import json
+from sqlmodel import SQLModel, Session, select
 import uvicorn
-
-from sqlalchemy import select
-from sqlalchemy.orm import lazyload
+from database import engine
+from model import Product
+from entity import Product as ProductEntity
 
 app = FastAPI()
 
-model.Base.metadata.create_all(bind=engine)
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-db_dependency = Annotated[Session, Depends(get_db)]
+@app.on_event("startup")
+async def startup():
+    SQLModel.metadata.create_all(engine, checkfirst=True)
+    print("Database connected")
 
 
 @app.post("/api/products")
-async def products():
-    products = select(Product).options(lazyload(Product.ProductAttributes))
-    return {"data": products}
+async def products(product: ProductEntity):
+    with Session(engine) as session:
+        products = session.exec(select(Product)).all()
+
+        return {"code": "000", "message": "Successfully", "data": products}
 
 
 @app.post("/api/product_attributes")
 async def product_attributes():
-    return
+    pass
 
 
 @app.post("/api/product_prices")
 async def product_prices():
-    return
+    pass
 
 
 @app.post("/api/region_product_prices")
 async def region_product_prices():
-    return
+    pass
 
 
 @app.post("/api/period_product_price")
 async def period_product_price():
-    return
+    pass
 
 
 if __name__ == "__main__":

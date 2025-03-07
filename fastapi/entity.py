@@ -1,9 +1,8 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 
 class ProductAttribute(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
     id: int
     product_id: int
     color_name: str
@@ -11,8 +10,6 @@ class ProductAttribute(BaseModel):
 
 
 class ProductPrice(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     id: int
     product_id: int
     region_name: str
@@ -20,11 +17,5 @@ class ProductPrice(BaseModel):
 
 
 class Product(BaseModel):
-    mmodel_config = ConfigDict(from_attributes=True)
-
-    id: int
-    sku: str
-    name: str
-    description: str
-    product_attributes: List[ProductAttribute]
-    product_prices: List[ProductPrice]
+    region: Optional[str]
+    period: Optional[str]

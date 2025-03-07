@@ -1,78 +1,81 @@
-from typing import List
-from sqlalchemy import ForeignKey, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from database import Base
 from decimal import Decimal
+from sqlmodel import Field, Index, Session, SQLModel, UniqueConstraint, create_engine
 
 
-class AttributeValue(Base):
+class Product(SQLModel, table=True):
+    __tablename__ = "products"
+
+    id: int = Field(primary_key=True)
+    sku: str
+    name: str
+    description: str
+
+    __table_args__ = (UniqueConstraint("sku", name="uniq_products"),)
+
+
+class Region(SQLModel, table=True):
+    __tablename__ = "regions"
+
+    id: int = Field(primary_key=True)
+    name: str = Field(index=True)
+
+    __table_args__ = (UniqueConstraint("name", name="uniq_regions"),)
+
+
+class RentalPeriod(SQLModel, table=True):
+    __tablename__ = "rental_periods"
+
+    id: int = Field(primary_key=True)
+    name: str = Field(index=True)
+    value: int
+
+    __table_args__ = (UniqueConstraint("name", name="uniq_rental_periods"),)
+
+
+class AttributeValue(SQLModel, table=True):
     __tablename__ = "attribute_values"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    attribute_id: Mapped[int] = mapped_column(ForeignKey("attributes.id"))
-    value: Mapped[str] = mapped_column()
 
-    __table_args__ = (UniqueConstraint("attribute_id", "value"),)
+    id: int = Field(primary_key=True)
+    attribute_id: int = Field(foreign_key="attributes.id", index=True)
+    value: str
+
+    __table_args__ = (
+        UniqueConstraint("attribute_id", "value",
+                         name="uniq_attribute_values"),
+    )
 
 
-class Attribute(Base):
+class Attribute(SQLModel, table=True):
     __tablename__ = "attributes"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(index=True)
-    AttributeValues: Mapped[List[AttributeValue]] = relationship()
 
-    __table_args__ = (UniqueConstraint("name"),)
+    id: int = Field(primary_key=True)
+    name: str = Field(index=True)
+
+    __table_args__ = (
+        UniqueConstraint("name", name="uniq_attributes"),
+    )
 
 
-class ProductAttribute(Base):
+class ProductAttribute(SQLModel, table=True):
     __tablename__ = "product_attributes"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
-    color_id: Mapped[int] = mapped_column(
-        ForeignKey("attribute_values.id"))
-    size_id: Mapped[int] = mapped_column(ForeignKey("attribute_values.id"))
 
-    __table_args__ = (UniqueConstraint("product_id", "color_id", "size_id"),)
-
-
-class ProductPrice(Base):
-    __tablename__ = "product_prices"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"))
-    rental_period_id: Mapped[int] = mapped_column(
-        ForeignKey("rental_periods.id"))
-    product_id: Mapped[int] = mapped_column(ForeignKey("products.id"))
-    price: Mapped[Decimal] = mapped_column()
+    id: int = Field(primary_key=True)
+    product_id: int = Field(foreign_key="products.id", index=True)
+    color_id: int = Field(foreign_key="attribute_values.id")
+    size_id: int = Field(foreign_key="attribute_values.id")
 
     __table_args__ = (UniqueConstraint(
-        "region_id", "rental_period_id", "product_id"),)
+        "product_id", "color_id", "size_id", name="unique_product_attributes"),)
 
 
-class Product(Base):
-    __tablename__ = "products"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    sku: Mapped[str] = mapped_column(index=True)
-    name: Mapped[str] = mapped_column()
-    description: Mapped[str] = mapped_column()
-    ProductAttributes: Mapped[List[ProductAttribute]] = relationship()
-    ProductPrices: Mapped[List[ProductPrice]] = relationship()
+class ProductPrice(SQLModel, table=True):
+    __tablename__ = "product_prices"
 
-    __table_args__ = (UniqueConstraint("sku"),)
+    id: int = Field(primary_key=True)
+    region_id: int = Field(foreign_key="regions.id", index=True)
+    rental_period_id: int = Field(foreign_key="rental_periods.id", index=True)
+    product_id: int = Field(foreign_key="products.id", index=True)
+    price: Decimal
 
-
-class Region(Base):
-    __tablename__ = "regions"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(index=True)
-    ProductAttributes: Mapped[List[ProductAttribute]] = relationship()
-
-    __table_args__ = (UniqueConstraint("name"),)
-
-
-class RentalPeriod(Base):
-    __tablename__ = "rental_periods"
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(index=True)
-    value: Mapped[int] = mapped_column()
-    ProductAttributes: Mapped[List[ProductAttribute]] = relationship()
-
-    __table_args__ = (UniqueConstraint("name"),)
+    __table_args__ = (UniqueConstraint(
+        "region_id", "rental_period_id", "product_id", name="uniq_product_prices"),)
