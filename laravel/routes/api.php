@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 /*    return $request->user();*/
 /*})->middleware('auth:sanctum');*/
 
+Route::post("/test", [AssignmentController::class, 'test']);
 Route::post("/products", [AssignmentController::class, 'products'])->name('products');
 Route::post("/product_attributes", [AssignmentController::class, 'product_attribute_values'])->name('product_attributes');
 Route::post("/product_prices", [AssignmentController::class, 'product_region_prices'])->name('product_prices');

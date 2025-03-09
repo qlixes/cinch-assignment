@@ -8,27 +8,20 @@ class ProductAttribute extends Model
 {
     protected $guarded = [];
 
-    protected $hidden = ["created_at", "updated_at", "attribute_color", "attribute_size", "product_id", "color_id", "size_id"];
+    protected $hidden = ["created_at", "updated_at"];
 
-    protected $appends = ['color', 'size'];
-
-    function attribute_color()
+    function attributes()
     {
-        return $this->belongsTo(AttributeValue::class, 'color_id');
+        $this->belongsTo(Attribute::class);
     }
 
-    function attribute_size()
+    function attribute_values()
     {
-        return $this->belongsTo(AttributeValue::class, 'size_id');
+        return $this->belongsTo(AttributeValue::class);
     }
 
-    function getColorAttribute()
+    function products()
     {
-        return $this->attribute_color->value;
-    }
-
-    function getSizeAttribute()
-    {
-        return $this->attribute_size->value;
+        return $this->belongsTo(Product::class);
     }
 }

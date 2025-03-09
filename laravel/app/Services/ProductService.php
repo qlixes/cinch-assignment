@@ -11,6 +11,11 @@ final class ProductService extends BaseService
         $this->repository = $repository;
     }
 
+    function showProductTest()
+    {
+        return $this->repository->test();
+    }
+
     function showProductDetails($request)
     {
         return $this->repository->full_details($request->region_id, $request->rental_period_id);

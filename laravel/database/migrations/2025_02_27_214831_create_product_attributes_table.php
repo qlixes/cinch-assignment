@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('product_id');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('restrict');
-            $table->unsignedBigInteger('color_id');
-            $table->foreign('color_id')->references('id')->on('attribute_values')->onDelete('restrict');
-            $table->unsignedBigInteger('size_id');
-            $table->foreign('size_id')->references('id')->on('attribute_values')->onDelete('restrict');
+            $table->unsignedBigInteger('attribute_id');
+            $table->foreign('attribute_id')->references('id')->on('attributes')->onDelete('restrict');
+            $table->unsignedBigInteger('attribute_value_id');
+            $table->foreign('attribute_value_id')->references('id')->on('attribute_values')->onDelete('restrict');
             $table->timestamps();
-            $table->unique(['product_id', 'color_id', 'size_id']);
+            $table->unique(['product_id', 'attribute_value_id']);
         });
     }
 

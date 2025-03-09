@@ -11,7 +11,14 @@ class ProductRepository extends BaseRepository
         $this->model = $model;
     }
 
-    function full_details(int $region_id = null, int $period_id = null)
+    function test()
+    {
+        $product = $this->model->with('attributes')->paginate();
+
+        return $product;
+    }
+
+    function full_details(int $region_id, int $period_id)
     {
         $product = $this->model->with('product_attributes', 'product_prices');
 
